@@ -14,7 +14,7 @@ letter_index=[] #intialize as an empty list
 for t in letters:
     letter_index.append("http://www.boxofficemojo.com" + t['href'])
 
-for i in range(0,27): #loop through all letter indices for movies
+for i in [2]: #range(0,27): #loop through all letter indices for movies
     current_url=letter_index[i]
     soup = BeautifulSoup(urlopen(current_url).read())
     navbar=soup.find('div', 'alpha-nav-holder')
@@ -43,7 +43,7 @@ for i in range(0,27): #loop through all letter indices for movies
 
 
 with open("movie_data.csv", "w") as f:
-    fieldnames = ("title","director1","director2","domestic", "distributor","limited","release","genre","runtime","rating","budget","worldwide","actor1","actor2","actor3","actor4","actor5","actor6","producer1","producer2","producer3","producer4","producer5","producer6","writer1","writer2","composer1","composer2")#can add foreign release dates/boxoffice, review data, award data, trope data from other sites eventually
+    fieldnames = ("title","director1","director2","domestic", "distributor","limited","release","genre","genres","franchises","runtime","rating","budget","worldwide","actor1","actor2","actor3","actor4","actor5","actor6","producer1","producer2","producer3","producer4","producer5","producer6","writer1","writer2","composer1","composer2")#can add foreign release dates/boxoffice, review data, award data, trope data from other sites eventually
     output = csv.writer(f, delimiter=",")
     output.writerow(fieldnames)
 
@@ -98,7 +98,7 @@ with open("movie_data.csv", "w") as f:
         actor4=actor_list[3]
         actor5=actor_list[4]
         actor6=actor_list[5]
-    
+
         producers=soup.findAll('a', href= re.compile('Producer&id'))
         producer_list=[]
         for t in producers:
@@ -112,7 +112,7 @@ with open("movie_data.csv", "w") as f:
         producer4=producer_list[3]
         producer5=producer_list[4]
         producer6=producer_list[5]
-    
+
         soup = BeautifulSoup(urlopen(current_url).read())
 
         all_bs=soup.findAll('b')
@@ -157,22 +157,23 @@ with open("movie_data.csv", "w") as f:
                         worldwide='N/A'
                     else:
                         worldwide=str(b_list[13])
-                        #print release
-                #else:
-                    #print 'bad format'
-                    #print url    #i want to see which ones i threw away, to check if my criteria is good
-                    #print 'bad format'
-            for b in all_bs:
-                if 'release=theatrical' in str(b.decode_contents()):
-                    raw_text = b.parent.text.split("\n")
-                    if len(raw_text) > 1:
-                        limited = raw_text[0].strip().split(" (")[-2]
-                        release = raw_text[1].strip().split(" (")[-2]
-            try:
-                limited
-            except NameError:
                 limited = ''
-            else:
-                output.writerow([title,director1,director2,domestic,distributor,limited,release,genre,runtime,rating,budget,worldwide,actor1,actor2,actor3,actor4,actor5,actor6,producer1,producer2,producer3,producer4,producer5,producer6,writer1,writer2,composer1,composer2])
+                for b in all_bs:
+                    if 'release=theatrical' in str(b.decode_contents()):
+                        raw_text = b.parent.text.split("\n")
+                        if len(raw_text) > 1:
+                            limited = raw_text[0].strip().split(" (")[-2]
+                            release = raw_text[1].strip().split(" (")[-2]
+                franchises = ''
+                genres = ''
+                all_mp_box = soup.findAll('div', {'class': 'mp_box'})
+                for mp in all_mp_box:
+                    if mp.find('div').text == 'Genres':
+                        genres_div = mp
+                        genres = ','.join(list(map(lambda x: x.text, genres_div.findAll('a'))))
+                    if mp.find('div').text == 'Franchises':
+                        franchises_div = mp
+                        franchises = ','.join(list(map(lambda x: x.text, franchises_div.findAll('a'))))
+            output.writerow([title,director1,director2,domestic,distributor,limited,release,genre,genres,franchises,runtime,rating,budget,worldwide,actor1,actor2,actor3,actor4,actor5,actor6,producer1,producer2,producer3,producer4,producer5,producer6,writer1,writer2,composer1,composer2])
 
 print("Done writing file")
