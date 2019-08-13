@@ -7,7 +7,7 @@ ehthumbs.db
 *.egg-info/
 dist/
 movie_data.csv
-
+**/__pycache__/**
 # Folder config file
 Desktop.ini
 
