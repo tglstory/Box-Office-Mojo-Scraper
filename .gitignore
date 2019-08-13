@@ -6,6 +6,7 @@ ehthumbs.db
 .tox
 *.egg-info/
 dist/
+movie_data.csv
 
 # Folder config file
 Desktop.ini
