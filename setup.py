@@ -18,11 +18,18 @@ setup(
     url = 'https://github.com/tglstory/Box-Office-Mojo-Scrapper',
     packages = find_packages(exclude=('tests', 'docs')),
     install_requires = [
-    	'beautifulsoup4',
-    	'urllib3'
+        'beautifulsoup4',
+        'requests',
+        's3fs',
     ],
+    scripts=[
+    	'bom_runner.py'
+    ],
+    entry_points = {
+        "console_scripts": ['bom_download = bom_scraper.bom_download_html:main']
+    },
     test_suite='tests',
     tests_require=[
-    	'beautifulsoup4'
+        'beautifulsoup4'
     ]
 )
